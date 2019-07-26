@@ -1,0 +1,33 @@
+{
+  "name": "syvo-gulp-boilerplate",
+  "version": "1.0.0",
+  "description": "Gulp boilerplate for SYVO students",
+  "scripts": {
+    "build": "gulp build",
+    "watch": "gulp watch"
+  },
+  "author": "Yauheni But-Husaim",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^7.1.5",
+    "browser-sync": "^2.18.8",
+    "css-mqpacker": "^6.0.1",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-cache": "^0.4.6",
+    "gulp-concat": "^2.6.1",
+    "gulp-cssnano": "^2.1.2",
+    "gulp-if": "^3.0.0",
+    "gulp-imagemin": "^3.4.0",
+    "gulp-plumber": "^1.1.0",
+    "gulp-postcss": "^7.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.1.0",
+    "gulp-sass-glob": "^1.0.9",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-tinypng-nokey": "^1.1.0",
+    "gulp-uglify": "^3.0.2",
+    "imagemin-pngquant": "^5.0.1",
+    "run-sequence": "^2.2.0"
+  }
+}
