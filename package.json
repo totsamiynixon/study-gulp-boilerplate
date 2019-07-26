@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Gulp boilerplate for SYVO students",
   "scripts": {
+    "build:prod": "gulp build --production",
     "build": "gulp build",
     "watch": "gulp watch"
   },
@@ -28,6 +29,7 @@
     "gulp-tinypng-nokey": "^1.1.0",
     "gulp-uglify": "^3.0.2",
     "imagemin-pngquant": "^5.0.1",
-    "run-sequence": "^2.2.0"
+    "run-sequence": "^2.2.0",
+    "yargs": "^13.3.0"
   }
 }

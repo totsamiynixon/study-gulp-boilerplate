@@ -1,5 +1,7 @@
 "use strict";
 
+var argv = require('yargs').argv;
+
 var config = {
   paths: {
     base: "src",
@@ -13,7 +15,6 @@ var config = {
       js: "src/libs/js",
       css: "src/libs/css"
     },
-    dist: process.env.NODE_ENV == "production" ? "dist/build" : "dist/dev"
   },
   libs: {
     js: [
@@ -25,9 +26,11 @@ var config = {
     css: ["bootstrap.min.css", "bootstrap_skin.css"]
   },
   isProd: function() {
-    return process.env.NODE_ENV == "production";
+    return argv.production === undefined ? false : true;
   }
 };
+
+config.paths.dist = config.isProd() ? "dist/build" : "dist/dev"
 
 var gulp = require("gulp"),
   gulpIf = require("gulp-if"),

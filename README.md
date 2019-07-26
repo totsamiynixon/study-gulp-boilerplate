@@ -1,4 +1,5 @@
 ## How to use
 
-4. ```gulp build```  builds project to dist/prod
-5. ```gulp watch```	 builds project to dist/dev with live reload
+1. ```npm run watch```	 serves project to dist/dev with live reload
+2. ```npm run build```  builds project to dist/dev
+2. ```npm run build:prod```  builds project for production to dist/prod
