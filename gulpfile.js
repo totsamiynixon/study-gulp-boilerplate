@@ -10,10 +10,6 @@ var config = {
       fonts: "src/assets/fonts",
       image: "src/assets/img",
       js: "src/assets/js/main.js"
-    },
-    libs: {
-      js: "src/libs/js/main.js",
-      sass: "src/libs/sass"
     }
   },
   isProd: function() {
