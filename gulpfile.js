@@ -1,6 +1,6 @@
 "use strict";
 
-var argv = require('yargs').argv;
+var argv = require("yargs").argv;
 
 var config = {
   paths: {
@@ -9,28 +9,38 @@ var config = {
       sass: "src/assets/sass",
       fonts: "src/assets/fonts",
       image: "src/assets/img",
-      js: "src/assets/js"
-    },
-    libs: {
-      js: "src/libs/js",
-      css: "src/libs/css"
-    },
-  },
-  libs: {
-    js: [
-      "modernizr.js",
-      "jquery-1.11.2.min.js",
-      "bootstrap.min.js",
-      "plugins-scroll.js"
-    ],
-    css: ["bootstrap.min.css", "bootstrap_skin.css"]
+      js: "src/assets/js/main.js"
+    }
   },
   isProd: function() {
     return argv.production === undefined ? false : true;
   }
 };
 
-config.paths.dist = config.isProd() ? "dist/build" : "dist/dev"
+var webpackConfig = {
+  output: {
+    filename: "main.min.js"
+  },
+  module: {
+    rules: [
+      // {test: /modernizr/, loader: 'imports-loader?this=>window!exports-loader?window.Modernizr'},
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /(node_modules)/,
+        loader: "babel-loader",
+        query: {
+          presets: [["env", { modules: false }]]
+        }
+      }
+    ]
+  }
+};
+
+config.paths.dist = config.isProd() ? "dist/build" : "dist/dev";
+
+if (!config.isProd()) {
+  webpackConfig.devtool = 'source-map';
+}
 
 var gulp = require("gulp"),
   gulpIf = require("gulp-if"),
@@ -51,7 +61,10 @@ var gulp = require("gulp"),
   pngquant = require("imagemin-pngquant"),
   del = require("del"),
   run = require("run-sequence"),
-  cache = require("gulp-cache");
+  cache = require("gulp-cache"),
+  webpack = require("webpack"),
+  webpack = require("webpack"),
+  webpackStream = require("webpack-stream");
 
 gulp.task("browser-sync", function() {
   browserSync({
@@ -85,13 +98,19 @@ gulp.task("style", function() {
 });
 
 gulp.task("js", function() {
-  return gulp
-    .src(config.paths.assets.js + "/app.js")
-    .pipe(gulpIf(!config.isProd(), sourcemaps.init()))
-    .pipe(uglify())
-    .pipe(rename({ suffix: ".min" }))
-    .pipe(gulpIf(!config.isProd(), sourcemaps.write(".")))
-    .pipe(gulp.dest(config.paths.dist + "/js"));
+  return (
+    gulp
+      .src(config.paths.assets.js)
+      // .pipe(gulpIf(!config.isProd(), sourcemaps.init()))
+      .pipe(
+        webpackStream(webpackConfig),
+        webpack
+      )
+      // .pipe(uglify())
+      // .pipe(rename({ suffix: ".min" }))
+      // .pipe(gulpIf(!config.isProd(), sourcemaps.write(".")))
+      .pipe(gulp.dest(config.paths.dist + "/js"))
+  );
 });
 
 gulp.task("img", function() {
@@ -117,29 +136,39 @@ gulp.task("img", function() {
     .pipe(gulp.dest(config.paths.dist + "/img"));
 });
 
-gulp.task("css-libs", function() {
-  return gulp
-    .src(
-      config.libs.css.map(function(lib) {
-        return config.paths.libs.css + "/" + lib;
-      })
-    )
-    .pipe(concat("libs.min.css"))
-    .pipe(cssnano())
-    .pipe(gulp.dest(config.paths.dist + "/css"));
-});
+// gulp.task("sass-libs", function() {
+//   return gulp
+//     .src(config.paths.libs.sass + "/libs.scss")
+//     .pipe(plumber())
+//     .pipe(sassGlob())
+//     .pipe(gulpIf(!config.isProd(), sourcemaps.init()))
+//     .pipe(sass())
+//     .pipe(
+//       postcss([
+//         autoprefixer({ browsers: ["last 10 versions"] }),
+//         mqpacker({
+//           sort: true
+//         })
+//       ])
+//     )
+//     .pipe(cssnano())
+//     .pipe(rename({ suffix: ".min" }))
+//     .pipe(gulpIf(!config.isProd(), sourcemaps.write(".")))
+//     .pipe(gulp.dest(config.paths.dist + "/css"))
+//     .pipe(browserSync.reload({ stream: true }));
+// });
 
-gulp.task("js-libs", function() {
-  return gulp
-    .src(
-      config.libs.js.map(function(lib) {
-        return config.paths.libs.js + "/" + lib;
-      })
-    )
-    .pipe(concat("libs.min.js"))
-    .pipe(uglify())
-    .pipe(gulp.dest(config.paths.dist + "/js"));
-});
+// gulp.task("js-libs", function() {
+//   return gulp
+//     .src(config.paths.libs.js)
+//     .pipe(
+//       webpackStream(webpackConfig),
+//       webpack
+//     )
+//     .pipe(uglify())
+//     .pipe(rename({ name: "libs", suffix: ".min" }))
+//     .pipe(gulp.dest(config.paths.dist + "/js"));
+// });
 
 gulp.task("clean", function() {
   del.sync(config.paths.dist + "");
@@ -160,17 +189,7 @@ gulp.task("copy:fonts", function() {
 
 gulp.task(
   "watch",
-  [
-    "clean",
-    "browser-sync",
-    "style",
-    "js",
-    "css-libs",
-    "js-libs",
-    "img",
-    "copy:fonts",
-    "copy:html"
-  ],
+  ["clean", "browser-sync", "js", "style", "img", "copy:fonts", "copy:html"],
   function() {
     gulp.watch(config.paths.base + "/**/*.html", ["copy:html"]);
     gulp.watch(
@@ -185,17 +204,7 @@ gulp.task(
 );
 
 gulp.task("build", function(fn) {
-  run(
-    "clean",
-    "css-libs",
-    "js-libs",
-    "style",
-    "js",
-    "img",
-    "copy:fonts",
-    "copy:html",
-    fn
-  );
+  run("clean", "js", "style", "img", "copy:fonts", "copy:html", fn);
 });
 
 gulp.task("clear", function(callback) {

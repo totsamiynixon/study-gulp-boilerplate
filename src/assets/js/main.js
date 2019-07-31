@@ -1,3 +1,9 @@
+import "script-loader!../../libs/js/modernizr";
+import "script-loader!../../libs/js/jquery-1.11.2";
+import "script-loader!../../libs/js/bootstrap";
+import "script-loader!../../libs/js/plugins-scroll";
+
+
 $(function() {
 
     function initSize(){
